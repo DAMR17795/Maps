@@ -87,6 +87,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMyLoca
             }
             else ->{}
             //hola
+            //añadido desde github
         }
     }
 
