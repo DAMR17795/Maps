@@ -83,12 +83,20 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMyLoca
                             val latitude = location?.latitude
                             val longitude = location?.longitude
                             start="${longitude},${latitude}"
+                            //Murgi
                             //end="-2.815780, 36.781763"
-                            end="-2.846159, 36.766384"
-                            createRoute()
+                            //Romelina
+                            //end="-2.846159, 36.766384"
+                            //createRoute()
                             // Hacer algo con la ubicación obtenida
+                            map.setOnMapClickListener {
+                                end = "${it.longitude},${it.latitude}"
+                                println("Longitud: ${it.longitude}, Latitud: ${it.latitude}")
+                                createRoute()
+                            }
                         }
                     }
+
                 //val latitude = location?.latitude
                 //val longitude = location?.longitude
                 //Toast.makeText(this, "Latitutd: " + location?.latitude + ", Longitud: " + location?.longitude, Toast.LENGTH_SHORT).show()
