@@ -2,7 +2,6 @@ package com.example.maps
 
 import android.Manifest
 import android.content.Context
-import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
 import android.location.LocationManager
@@ -29,34 +28,18 @@ import kotlinx.coroutines.launch
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
-class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMyLocationButtonClickListener {
+class MapaFinal : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMyLocationButtonClickListener {
     private lateinit var map:GoogleMap
     private lateinit var btnCalculate: Button
-    private lateinit var btnGuardar:Button
-    private lateinit var ubicacion:LatLng
 
     private var start:String=""
     private var end:String=""
 
     var poly:Polyline? = null
-        override fun onCreate(savedInstanceState: Bundle?) {
+    override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        setContentView(R.layout.ruta)
         btnCalculate = findViewById(R.id.btnCalculateRoute)
-        btnGuardar = findViewById(R.id.btnAceptar)
-
-        btnGuardar.setOnClickListener{
-            if (end!="") {
-                val i = Intent(this, ElegirActivity::class.java).apply {
-                    putExtra("UBI", ubicacion)
-                    putExtra("END", end)
-                }
-                startActivity(i)
-            } else {
-                Toast.makeText(this, "Debe seleccionar una ubicacion para continuar", Toast.LENGTH_SHORT).show()
-            }
-        }
-
 
         btnCalculate.setOnClickListener {
             val locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
@@ -67,6 +50,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMyLoca
             poly?.remove()
             start=""
             //end=""
+
             poly = null
 
             //Toast.makeText(this, "Seleccione punto de origen y final", Toast.LENGTH_SHORT).show()
@@ -97,19 +81,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMyLoca
                             val latitude = location?.latitude
                             val longitude = location?.longitude
                             start="${longitude},${latitude}"
-                            //Murgi
-                            //end="-2.815780, 36.781763"
-                            //Romelina
-                            //end="-2.846159, 36.766384"
-                            //createRoute()
-                            // Hacer algo con la ubicación obtenida
                             createRoute()
-                           /* map.setOnMapClickListener {
-                                end = "${it.longitude},${it.latitude}"
-
-                                println("Longitud: ${it.longitude}, Latitud: ${it.latitude}")
-                                createRoute()
-                            }*/
                         }
                     }
             }
@@ -122,10 +94,8 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMyLoca
             map.clear()
             end = "${it.longitude},${it.latitude}"
             val coordinates = LatLng(it.latitude, it.longitude)
-            ubicacion = LatLng(it.latitude, it.longitude)
             val marker:MarkerOptions = MarkerOptions().position(coordinates).title("Ubicación")
             map.addMarker(marker)
-            //map.moveCamera(CameraUpdateFactory.newLatLng(coordinates))
             map.animateCamera(
                 CameraUpdateFactory.newLatLngZoom(coordinates, 15f),
                 1000,
@@ -152,7 +122,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMyLoca
             if (call.isSuccessful){
                 Log.i("aris", "OK")
                 drawRoute(call.body())
-                
+
             } else {
                 Log.i("aris", "KO")
             }
@@ -177,50 +147,20 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMyLoca
 
     override fun onMapReady(googleMap: GoogleMap) {
         map = googleMap
-
+        createMarker()
         map.setOnMyLocationButtonClickListener(this)
         enableLocation()
-        metodo()
-
-        val fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
-
-        if (ActivityCompat.checkSelfPermission(
-                this,
-                Manifest.permission.ACCESS_FINE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
-                this,
-                Manifest.permission.ACCESS_COARSE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            return
-        }
-        fusedLocationClient.lastLocation
-            .addOnSuccessListener { location: Location? ->
-                // Se ha obtenido la ubicación actual
-                if (location != null) {
-                    val latitude = location?.latitude
-                    val longitude = location?.longitude
-                    val coordinates = LatLng(latitude!!, longitude!!)
-                    map.animateCamera(
-                        CameraUpdateFactory.newLatLngZoom(coordinates, 15f),
-                        4000,
-                        null
-                    )
-
-                }
-            }
+        //metodo()
     }
 
     private fun createMarker() {
-        val coordinates = LatLng(36.781853, -2.815791)
-        val marker:MarkerOptions = MarkerOptions().position(coordinates).title("I.E.S Murgi")
+        val bundle = intent
+        val coordinates = bundle.getParcelableExtra<LatLng>("UBIFINAL")
+        val destino = bundle?.getStringExtra("ENDFINAL")
+        end = destino.toString()
+        println(coordinates)
+        //val coordinates = LatLng(36.781853, -2.815791)
+        val marker:MarkerOptions = MarkerOptions().position(coordinates!!).title("Ubicación")
         map.addMarker(marker)
         map.animateCamera(
             CameraUpdateFactory.newLatLngZoom(coordinates, 18f),

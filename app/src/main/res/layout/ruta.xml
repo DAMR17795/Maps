@@ -15,18 +15,9 @@
 
     <Button
         android:id="@+id/btnCalculateRoute"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom|left"
+        android:layout_gravity="bottom"
         android:text="Calcula tu ruta"/>
 
-    <Button
-        android:id="@+id/btnAceptar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|right"
-        android:text="Guardar"/>
-
 </FrameLayout>
-
-
