@@ -50,10 +50,7 @@ class MapaFinal : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMyLocatio
             poly?.remove()
             start=""
             //end=""
-
             poly = null
-
-            //Toast.makeText(this, "Seleccione punto de origen y final", Toast.LENGTH_SHORT).show()
             if(::map.isInitialized) {
                 val fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
@@ -89,21 +86,6 @@ class MapaFinal : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMyLocatio
         createFragment()
     }
 
-    private fun metodo() {
-        map.setOnMapClickListener {
-            map.clear()
-            end = "${it.longitude},${it.latitude}"
-            val coordinates = LatLng(it.latitude, it.longitude)
-            val marker:MarkerOptions = MarkerOptions().position(coordinates).title("Ubicación")
-            map.addMarker(marker)
-            map.animateCamera(
-                CameraUpdateFactory.newLatLngZoom(coordinates, 15f),
-                1000,
-                null
-            )
-        }
-    }
-
     private fun getRetrofit(): Retrofit {
         return Retrofit.Builder()
             .baseUrl("https://api.openrouteservice.org/")
@@ -122,7 +104,6 @@ class MapaFinal : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMyLocatio
             if (call.isSuccessful){
                 Log.i("aris", "OK")
                 drawRoute(call.body())
-
             } else {
                 Log.i("aris", "KO")
             }

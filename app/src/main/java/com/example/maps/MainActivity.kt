@@ -45,6 +45,8 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMyLoca
         btnCalculate = findViewById(R.id.btnCalculateRoute)
         btnGuardar = findViewById(R.id.btnAceptar)
 
+        //Este boton guarda la ubicacion para el marcador
+        //y para calcular la ruta en la actividad final
         btnGuardar.setOnClickListener{
             if (end!="") {
                 val i = Intent(this, ElegirActivity::class.java).apply {
@@ -57,7 +59,8 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMyLoca
             }
         }
 
-
+        //Este boton calcula la ruta a modo de prueba si se quiere
+        //(seguramente lo quitemos)
         btnCalculate.setOnClickListener {
             val locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
 
@@ -68,8 +71,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMyLoca
             start=""
             //end=""
             poly = null
-
-            //Toast.makeText(this, "Seleccione punto de origen y final", Toast.LENGTH_SHORT).show()
             if(::map.isInitialized) {
                 val fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
@@ -97,19 +98,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMyLoca
                             val latitude = location?.latitude
                             val longitude = location?.longitude
                             start="${longitude},${latitude}"
-                            //Murgi
-                            //end="-2.815780, 36.781763"
-                            //Romelina
-                            //end="-2.846159, 36.766384"
-                            //createRoute()
-                            // Hacer algo con la ubicación obtenida
                             createRoute()
-                           /* map.setOnMapClickListener {
-                                end = "${it.longitude},${it.latitude}"
-
-                                println("Longitud: ${it.longitude}, Latitud: ${it.latitude}")
-                                createRoute()
-                            }*/
                         }
                     }
             }
@@ -117,6 +106,10 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMyLoca
         createFragment()
     }
 
+    //Este metodo permite crear un marcador
+    //al pinchar en el mapa, le pone de titulo
+    //ubicación por defecto y hace la animación
+    //para situar el mapa en el marcador colocado
     private fun metodo() {
         map.setOnMapClickListener {
             map.clear()
@@ -134,6 +127,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMyLoca
         }
     }
 
+    //Metodo para obtener la api de las rutas
     private fun getRetrofit(): Retrofit {
         return Retrofit.Builder()
             .baseUrl("https://api.openrouteservice.org/")
@@ -145,6 +139,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMyLoca
         const val REQUEST_CODE_LOCATION = 0
     }
 
+    //Metodo para crear la ruta
     private fun createRoute(){
         CoroutineScope(Dispatchers.IO).launch {
             val call = getRetrofit().create(ApiService::class.java)
@@ -152,13 +147,13 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMyLoca
             if (call.isSuccessful){
                 Log.i("aris", "OK")
                 drawRoute(call.body())
-                
             } else {
                 Log.i("aris", "KO")
             }
         }
     }
 
+    //Metodo para dibujar las lineas de la ruta
     private fun drawRoute(routeResponse: RouteResponse?) {
         val polyLineOptions = PolylineOptions()
         routeResponse?.features?.first()?.geometry?.coordinates?.forEach {
@@ -170,6 +165,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMyLoca
 
     }
 
+    //Metodo para cargar el fragment del mapa
     private fun createFragment() {
         val mapFragment:SupportMapFragment = supportFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
@@ -177,11 +173,16 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMyLoca
 
     override fun onMapReady(googleMap: GoogleMap) {
         map = googleMap
-
+        //Permite tener el boton que al pulsarlo
+        //te manda a la ubicación en tiempo real del gps
         map.setOnMyLocationButtonClickListener(this)
         enableLocation()
         metodo()
 
+        //Este codigo es para cuando al estar el mapa
+        //listo hace una animación para posicionarlo
+        //justo donde esté la ubicación el tiempo real
+        //del gps
         val fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
         if (ActivityCompat.checkSelfPermission(
@@ -218,22 +219,15 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMyLoca
             }
     }
 
-    private fun createMarker() {
-        val coordinates = LatLng(36.781853, -2.815791)
-        val marker:MarkerOptions = MarkerOptions().position(coordinates).title("I.E.S Murgi")
-        map.addMarker(marker)
-        map.animateCamera(
-            CameraUpdateFactory.newLatLngZoom(coordinates, 18f),
-            4000,
-            null
-        )
-    }
-
+    //Metodo para comprobar si está el permiso
+    //de localización garatinzado
     private fun isLocationPermissionGranted() = ContextCompat.checkSelfPermission(
         this,
         android.Manifest.permission.ACCESS_FINE_LOCATION
     ) == PackageManager.PERMISSION_GRANTED
 
+    //Metodo habilita la localización
+    //cuando el mapa está inicializado
     private fun enableLocation() {
         if (!::map.isInitialized) return
         if (isLocationPermissionGranted()) {
@@ -245,6 +239,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMyLoca
         }
     }
 
+    //Metodo para pedir los permisos de ubicación
     private fun requestLocationPermission() {
         if(ActivityCompat.shouldShowRequestPermissionRationale(this, android.Manifest.permission.ACCESS_FINE_LOCATION)) {
             Toast.makeText(this, "Ve a ajustes y acepta los permisos", Toast.LENGTH_SHORT).show()
@@ -253,6 +248,8 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMyLoca
         }
     }
 
+    //Según la respuesta de la peticiónd de permisos
+    //lanza el toast o habilita la localización
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,
@@ -281,6 +278,8 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMyLoca
         }
     }
 
+    //Mensaje cuando pulsa el botoon de posicionar
+    //en la localización
     override fun onMyLocationButtonClick(): Boolean {
         Toast.makeText(this, "Boton Pulsado", Toast.LENGTH_SHORT).show()
         return false
