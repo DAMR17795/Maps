@@ -39,5 +39,10 @@
             android:name=".MapaFinal"
             android:exported="true">
         </activity>
+        <activity
+            android:name=".MapaAeropuertos"
+            android:exported="true">
+        </activity>
+
     </application>
 </manifest>

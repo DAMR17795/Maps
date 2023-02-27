@@ -14,21 +14,11 @@
 
 
     <Button
-        android:id="@+id/btnCalculateRoute"
-        android:layout_width="wrap_content"
+        android:id="@+id/btnIrA"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:backgroundTint="#0066FF"
-        android:layout_gravity="bottom|left"
-        android:text="Calcula tu ruta"/>
+        android:layout_gravity="bottom"
+        android:text="Ir a..."/>
 
-    <Button
-        android:id="@+id/btnAceptar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:backgroundTint="#00FF04"
-        android:layout_gravity="bottom|right"
-        android:text="Guardar"/>
 
 </FrameLayout>
-
-
